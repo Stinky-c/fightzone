@@ -1,0 +1,14 @@
+{
+  "fightzone.midnightconfig.enabled": "Enabled",
+  "fightzone.midnightconfig.entityBlacklist.label.tooltip": "Prevent the following entities from taking damage",
+  "fightzone.midnightconifg.damageTypeBlacklist.label.tooltip": "Prevent the following damage types",
+
+  "fightzone.midnightconfig.category.general": "General",
+  "fightzone.midnightconfig.category.entity": "Entity",
+  "fightzone.midnightconfig.category.damage_type": "Damage Type",
+  "fightzone.midnightconfig.category.damage_entity": "Source Entity",
+
+  "fightzone.midnightconfig.enableDamageTypeBlacklist": "Enable Damage Type Blacklist",
+  "fightzone.midnightconfig.damageTypeBlacklist": "Damage Type Blacklist",
+  "fightzone.midnightconfig.damageSourceDirectDisabled": "Blacklist Direct Damage"
+}
