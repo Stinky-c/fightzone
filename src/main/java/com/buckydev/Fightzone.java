@@ -1,20 +1,12 @@
 package com.buckydev;
 
-import com.buckydev.events.PlayerEvents;
+import com.buckydev.config.FightzoneConfig;
+import com.buckydev.config.FightzoneConfigLoader;
 import com.buckydev.script.Executor;
-import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.ModInitializer;
-
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.resources.Identifier;
-
-import net.minecraft.util.RandomSource;
-import org.apache.commons.jexl3.JexlBuilder;
-import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.JexlFeatures;
-import org.apache.commons.jexl3.introspection.JexlPermissions;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,33 +14,25 @@ public class Fightzone implements ModInitializer {
 
     public static final String MOD_ID = "fightzone";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final RandomSource MOD_RANDOM = RandomSource.createThreadLocalInstance(7);
+
+    public static FightzoneConfig CONFIG = FightzoneConfigLoader.loadConfig();
 
     public static Executor executor = new Executor();
 
     @Override
     public void onInitialize() {
-        MidnightConfig.init(Fightzone.MOD_ID, FightzoneConfig.class);
 
-        executor.init();
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register(Executor::livingEntityEvent);
+        ServerLivingEntityEvents.ALLOW_DEATH.register(Executor::livingEntityEvent);
 
-        ServerLivingEntityEvents.ALLOW_DAMAGE.register(
-                (entity, source, amount) -> Executor.allowDamage(executor, entity, source, amount));
-
-//        ServerLivingEntityEvents.ALLOW_DAMAGE.register(PlayerEvents::allowDamage);
-//        ServerLivingEntityEvents.ALLOW_DEATH.register(PlayerEvents::allowDeath);
-
-        ServerLifecycleEvents.START_DATA_PACK_RELOAD.register(
-                (_, _) -> {
-                    LOGGER.info("Reloading script executor");
-                    executor.clear();
-                });
-
-        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((_, _, success) -> {
-            if (success) {
-                executor.init();
-            }
+        ServerLifecycleEvents.START_DATA_PACK_RELOAD.register((server, resourceManager) -> {
+            LOGGER.info("Reloading config!");
+            CONFIG = FightzoneConfigLoader.loadConfig();
         });
+
+        // Save config
+        ServerLifecycleEvents.BEFORE_SAVE.register(
+                (server, flush, force) -> FightzoneConfigLoader.saveConfig(CONFIG, false));
 
     }
 

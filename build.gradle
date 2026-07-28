@@ -16,10 +16,12 @@ repositories {
     maven {
         url = "https://maven.midnightdust.eu/releases"
     }
+
 }
 
 loom {
     splitEnvironmentSourceSets()
+    loom.log4jConfigs.from "log4j-dev.xml"
 
     mods {
         "fightzone" {
@@ -40,6 +42,9 @@ dependencies {
     // midnightlib
     implementation include("eu.midnightdust:midnightlib:${project.midnightlib_version}")
     implementation include("org.apache.commons:commons-jexl3:${project.jexl_version}")
+
+    implementation include("org.yaml:snakeyaml:${project.snakeyaml_version}")
+
 
 }
 

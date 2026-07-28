@@ -1,24 +1,26 @@
 package com.buckydev.script;
 
+import static com.buckydev.Fightzone.CONFIG;
 import static com.buckydev.Fightzone.LOGGER;
 
-import com.buckydev.script.Loader.ScriptMap;
+import com.buckydev.Fightzone;
+import com.buckydev.config.FightzoneConfig.Script;
 import java.util.stream.Stream;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlFeatures;
+import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
 
 public class Executor {
 
-    JexlEngine engine = buildEngine();
-    Store store = new Store();
-    Loader loader = new Loader();
+    static JexlEngine engine = buildEngine();
 
     private static JexlEngine buildEngine() {
         JexlPermissions permissions = JexlPermissions.SECURE;
@@ -33,41 +35,48 @@ public class Executor {
     }
 
 
-    public void init() {
-        LOGGER.info("Initializing Executor");
-        ScriptMap map = loader.init(engine);
-        store.init(map);
+    public static JexlScript compileScript(String script) {
+        try {
+            return engine.createScript(script);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to parse script {}", e);
+            throw e;
+        }
     }
 
-    public void clear() {
+    public Stream<Script> engineIter(MapContext context) {
+
+        // iter scripts. Execute with context. Filter for only booleans and true. (True=Apply action)
+
+        return CONFIG.getScripts().stream()
+                .map(script -> Pair.of(script, script.getScript().execute(context)))
+                .filter(o -> o.getRight() instanceof Boolean bool && bool).map(o -> o.getLeft());
+
 
     }
 
-    public boolean engineIter(MapContext context) {
-        Stream<JexlExpression> stream = store.iter();
 
-        // Look for any match saying to cancel damage
-        return stream.anyMatch(expr -> (expr.evaluate(context) instanceof Boolean bool && !bool));
+    public static boolean livingEntityEvent(LivingEntity entity, DamageSource source, float amount) {
 
-    }
-
-    // region Player events
-    public static boolean allowDamage(Executor executor, LivingEntity entity, DamageSource source,
-            float amount) {
         MapContext context = new MapContext();
 
         String target = EntityType.getKey(entity.getType()).toString();
-//        String dmgSource = source.typeHolder().unwrapKey().get().identifier(); // FIXME: get on optional
+        @Nullable String dmgSource = source.typeHolder().unwrapKey()
+                .map(key -> key.identifier().toString()).orElse(null);
 
         context.set("target", target);
+        context.set("damage_source", dmgSource);
+        context.set("amount", amount);
 
-        return executor.engineIter(context);
+        Stream<Script> stream = Fightzone.executor.engineIter(context);
+
+        // Map matched scripts to their actions. Catch any action that is false. False cancel the event
+        return stream.map(script -> script.getAction().allowAction(true))
+                .filter(bool -> bool == false)
+                .findFirst()
+                .orElse(true);
     }
-
-//    public static boolean allowDeath(LivingEntity entity, DamageSource source, float amount) {
-//    }
-
-    // endregion
 
 
 }
