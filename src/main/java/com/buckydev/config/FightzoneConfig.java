@@ -100,6 +100,11 @@ public class FightzoneConfig {
 
         //endregion
 
+
+        @Override
+        public String toString() {
+            return name + " : " + action.getSerializedName();
+        }
     }
 
 }

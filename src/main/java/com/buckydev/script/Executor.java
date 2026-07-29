@@ -50,14 +50,20 @@ public class Executor {
         // iter scripts. Execute with context. Filter for only booleans and true. (True=Apply action)
 
         return CONFIG.getScripts().stream()
-                .map(script -> Pair.of(script, script.getScript().execute(context)))
+                .map(script -> Pair.of(script, this.execute(script.getScript(), context)))
                 .filter(o -> o.getRight() instanceof Boolean bool && bool).map(o -> o.getLeft());
 
 
     }
 
+    private Object execute(JexlScript script, MapContext context) {
+        // TODO: Script timings
+        return script.execute(context);
+    }
 
-    public static boolean livingEntityEvent(LivingEntity entity, DamageSource source, float amount) {
+
+    public static boolean livingEntityEvent(LivingEntity entity, DamageSource source,
+            float amount) {
 
         MapContext context = new MapContext();
 
@@ -71,11 +77,11 @@ public class Executor {
 
         Stream<Script> stream = Fightzone.executor.engineIter(context);
 
+        //TODO: more logging
+
         // Map matched scripts to their actions. Catch any action that is false. False cancel the event
         return stream.map(script -> script.getAction().allowAction(true))
-                .filter(bool -> bool == false)
-                .findFirst()
-                .orElse(true);
+                .filter(bool -> bool == false).findFirst().orElse(true);
     }
 
 

@@ -1,12 +1,18 @@
 package com.buckydev;
 
+import com.buckydev.command.DeleteScript;
+import com.buckydev.command.RevealConfig;
 import com.buckydev.config.FightzoneConfig;
 import com.buckydev.config.FightzoneConfigLoader;
 import com.buckydev.script.Executor;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.permissions.Permissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +39,14 @@ public class Fightzone implements ModInitializer {
         // Save config
         ServerLifecycleEvents.BEFORE_SAVE.register(
                 (server, flush, force) -> FightzoneConfigLoader.saveConfig(CONFIG, false));
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+
+            dispatcher.register(Commands.literal("fightzone").requires(
+                            source -> source.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                    .then(RevealConfig.register()));
+
+        });
 
     }
 
