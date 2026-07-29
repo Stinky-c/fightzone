@@ -1,6 +1,6 @@
 # Fightzone
 
-A JEXL evaluation to determine if players take damage.
+A JEXL scripting mod to determine how entities take damage.
 
 ## Configuration
 
