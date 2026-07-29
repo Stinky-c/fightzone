@@ -26,6 +26,7 @@ loom {
     mods {
         "fightzone" {
             sourceSet sourceSets.main
+            // Maybe modmenu or some client-side configuration
             sourceSet sourceSets.client
         }
     }
@@ -38,6 +39,8 @@ dependencies {
 
     implementation include("org.apache.commons:commons-jexl3:${project.jexl_version}")
     implementation include("org.yaml:snakeyaml:${project.snakeyaml_version}")
+
+    runtimeOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 
 
 }

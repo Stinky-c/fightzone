@@ -50,6 +50,15 @@ public class DeleteScript {
             scriptList.remove(i);
             dirty = true;
 
+            var target = "abc";
+
+            var xyz =
+
+            target !=
+              "player"
+
+            ;
+
         }
 
         if (dirty) {

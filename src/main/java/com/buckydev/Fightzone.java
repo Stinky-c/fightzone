@@ -59,16 +59,11 @@ public class Fightzone implements ModInitializer {
 
 
 /*
-Jexl engine
-Build at mod init.
-
-loads scripts into a store.
-(Store gets reset on a reload)
-Every event capture run the array of scripts.
-    Script returns true for an entity to take damage.
-    If a script does not return true continue to the next.
-
-Until script store is invalidated cache event occurences
+TODO:
+- Client side integration
+- Testing
+    - Programmatic access
+- linter/formatter
  */
 
 

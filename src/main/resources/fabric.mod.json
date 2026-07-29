@@ -10,7 +10,8 @@
   "contact": {
     "homepage": "https://github.com/Stinky-c/fightzone",
     "sources": "https://github.com/Stinky-c/fightzone",
-    "issues": "https://github.com/Stinky-c/fightzone/issues"
+    "issues": "https://github.com/Stinky-c/fightzone/issues",
+    "documentation": "https://github.com/Stinky-c/fightzone/blob/master/README.md#configuration"
   },
   "license": "GNU GPLv3",
   "icon": "assets/fightzone/icon.png",
@@ -18,11 +19,12 @@
   "entrypoints": {
     "main": [
       "com.buckydev.Fightzone"
+    ],
+    "client": [
+      "com.buckydev.client.FightzoneClient"
     ]
   },
-  "mixins": [
-    "fightzone.mixins.json"
-  ],
+  "mixins": [],
   "depends": {
     "fabricloader": ">=0.19.3",
     "minecraft": "~26.2",
