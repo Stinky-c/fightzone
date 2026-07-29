@@ -5,6 +5,7 @@ import static com.buckydev.Fightzone.LOGGER;
 
 import com.buckydev.Fightzone;
 import com.buckydev.config.FightzoneConfig.Script;
+import java.util.Optional;
 import java.util.stream.Stream;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -62,7 +63,7 @@ public class Executor {
     }
 
 
-    public static boolean livingEntityEvent(LivingEntity entity, DamageSource source,
+    private static MapContext extractContext(LivingEntity entity, DamageSource source,
             float amount) {
 
         MapContext context = new MapContext();
@@ -71,10 +72,19 @@ public class Executor {
         @Nullable String dmgSource = source.typeHolder().unwrapKey()
                 .map(key -> key.identifier().toString()).orElse(null);
 
+        @Nullable String attacker = Optional.ofNullable(source.getEntity())
+                .map(entity1 -> EntityType.getKey(entity1.getType()).toString()).orElse(null);
+
         context.set("target", target);
         context.set("damage_source", dmgSource);
         context.set("amount", amount);
+        context.set("attacker", attacker);
 
+        return context;
+
+    }
+
+    private static boolean applyContext(MapContext context) {
         Stream<Script> stream = Fightzone.executor.engineIter(context);
 
         //TODO: more logging
@@ -82,6 +92,23 @@ public class Executor {
         // Map matched scripts to their actions. Catch any action that is false. False cancel the event
         return stream.map(script -> script.getAction().allowAction(true))
                 .filter(bool -> bool == false).findFirst().orElse(true);
+    }
+
+    public static boolean livingEntityDamageEvent(LivingEntity entity, DamageSource source,
+            float amount) {
+        MapContext context = extractContext(entity, source, amount);
+
+        context.set("event", "damage");
+
+        return applyContext(context);
+    }
+
+    public static boolean livingEntityDeathEvent(LivingEntity entity, DamageSource source,
+            float amount) {
+        MapContext context = extractContext(entity, source, amount);
+        context.set("event", "death");
+
+        return applyContext(context);
     }
 
 

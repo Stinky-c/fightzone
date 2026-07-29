@@ -37,7 +37,7 @@ public final class FightzoneConfigLoader {
         loaderOptions.setTagInspector(
                 tag -> tag.getClassName().equals(FightzoneConfig.class.getName()));
 
-        // TODO: Tweak
+        // TODO: Tweak yaml loading
 
         Constructed constructed = new Constructed(FightzoneConfig.class, loaderOptions);
         Representer representer = new Represented(dumperOptions);

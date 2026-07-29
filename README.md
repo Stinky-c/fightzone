@@ -2,14 +2,29 @@
 
 A JEXL evaluation to determine if players take damage.
 
-## Language
+## Configuration
 
-```jexl
+```yaml
+enabled: true # Controls if scripts are evaluated at all.
+saveEnabled: false # Controls config file saving. Useful if you want to keep the config pretty
+scripts: # A script has 3 parts
+  - action: DENY # Must be any of `ALLOW`, `DENY`, `PASS`. Case-sensitive
+    name: Player protection # A name to locate quickly
+    # Every script element must start with a `!script`. This makes the element a jexl script
+    # The YAML formatting style should not matter. Below is a literal block scalar, this is the easiest to use. 
+    script: !script |
+      target == 'minecraft:player'
+
+  - action: DENY
+    name: Wolf protection
+    # If an attacker is a player and the target is a wolf, the damage is blocked
+    script: !script |
+      (attacker != null && attacker == 'minecraft:player' ) && target == 'minecraft:wolf'
+
 
 ```
 
-- [Language Reference](https://commons.apache.org/proper/commons-jexl/reference/syntax.html)
--
+- [JEXL Reference](https://commons.apache.org/proper/commons-jexl/reference/syntax.html)
 
 ### Variable List
 
@@ -22,7 +37,7 @@ A JEXL evaluation to determine if players take damage.
     - `minecraft:wolf`
     - `othermod:creature`
 
-The identifier for the entity taking damage
+The identifier for the entity taking damage.
 
 #### `amount`
 
@@ -33,7 +48,7 @@ The identifier for the entity taking damage
     - `1.0`
     - `0.5`
 
-The amount of damage applying to the entity
+The amount of damage applying to the entity.
 
 #### `damage_source`
 
@@ -44,4 +59,24 @@ The amount of damage applying to the entity
     - `minecraft:campfire`
     - `othermod:magic`
 
-### Function List
+The identifier for the damage type being applied.
+
+#### `attacker`
+
+- Type: `string`
+- Nullable: `true`
+- Examples:
+    - `null`
+    - `minecraft:player`
+
+The identifier for the attacking entity, is usually null when it's environmental damage like fire.
+
+#### `event`
+
+- Type: `string`
+- Nullable: `false`
+- Examples:
+    - `death`
+    - `damage`
+
+A helper to differentiate between a death or damage event.

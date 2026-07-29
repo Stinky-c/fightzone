@@ -28,8 +28,8 @@ public class Fightzone implements ModInitializer {
     @Override
     public void onInitialize() {
 
-        ServerLivingEntityEvents.ALLOW_DAMAGE.register(Executor::livingEntityEvent);
-        ServerLivingEntityEvents.ALLOW_DEATH.register(Executor::livingEntityEvent);
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register(Executor::livingEntityDamageEvent);
+        ServerLivingEntityEvents.ALLOW_DEATH.register(Executor::livingEntityDeathEvent);
 
         ServerLifecycleEvents.START_DATA_PACK_RELOAD.register((server, resourceManager) -> {
             LOGGER.info("Reloading config!");
